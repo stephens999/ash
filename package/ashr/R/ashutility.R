@@ -188,6 +188,27 @@ cdf.ash=function(a,x,lower.tail=TRUE){
 }
 
 
+#Functions from MATLAB packages, used to measure performance and to show progress
+tic <- function(gcFirst = TRUE, type=c("elapsed", "user.self", "sys.self"))
+{
+   type <- match.arg(type)
+   assign(".type", type, envir=baseenv())
+   if(gcFirst) gc(FALSE)
+   tic <- proc.time()[type]         
+   assign(".tic", tic, envir=baseenv())
+   invisible(tic)
+}
+
+toc <- function()
+{
+   type <- get(".type", envir=baseenv())
+   toc <- proc.time()[type]
+   tic <- get(".tic", envir=baseenv())
+   print(toc - tic)
+   invisible(toc)
+}
+
+
 
 #' @title Credible Interval Computation for the ash object
 #'
@@ -219,17 +240,17 @@ cdf.ash=function(a,x,lower.tail=TRUE){
 #'
 #' CImatrix1=ashci(beta.ash,level=0.95,betaindex=c(1,2,5))
 #' CImatrix2=ashci(beta.ash,level=0.95,lfsrcriteria=0.1)
-#' CImatrix3=ashci(beta.ash,level=0.95, betaindex=c(1:length(beta)),ncores=4)
+#' #CImatrix3=ashci(beta.ash,level=0.95, betaindex=c(1:length(beta)),ncores=4)
 #' print(CImatrix1)
 #' print(CImatrix2)
-#' print(CImatrix3)
+#' #print(CImatrix3)
 #' 
-#' #A larger example
-#' beta = c(rep(0,1000),rnorm(1000))
-#' sebetahat = abs(rnorm(2000,0,1))
-#' betahat = rnorm(2000,beta,sebetahat)
-#' beta.ash = ash(betahat, sebetahat)
-#' CImatrix4 = ashci(beta.ash,level=0.95, betaindex=c(1:length(beta)),ncores=4)
+#' ##A larger example
+#' #beta = c(rep(0,1000),rnorm(1000))
+#' #sebetahat = abs(rnorm(2000,0,1))
+#' #betahat = rnorm(2000,beta,sebetahat)
+#' #beta.ash = ash(betahat, sebetahat)
+#' #CImatrix4 = ashci(beta.ash,level=0.95, betaindex=c(1:length(beta)),ncores=4)
 #todo/issue=> all set!
 #1.Q:Could do parallel computing to reduce the computation time
 #1.A:Done by doParallel
@@ -244,7 +265,7 @@ ashci = function (a,level=0.95,betaindex,lfsrcriteria=0.05,tol=1e-5, maxcounts=1
   if(missing(betaindex)){
   	betaindex =(a$lfsr<=lfsrcriteria)
   	betaindex[is.na(betaindex)]=FALSE #Some lfsrs would have NA
-  }  
+  }
   x=a$data$betahat[betaindex]
   s=a$data$sebetahat[betaindex]
   PosteriorMean=a$PosteriorMean[betaindex]
@@ -455,7 +476,7 @@ ci.upper=function(z,m,x,s,level,df){
 #' sebetahat = abs(rnorm(200,0,1))
 #' betahat = rnorm(200,beta,sebetahat)
 #' beta.ashm = ashm(betahat, sebetahat,alpha=6)
-#' beta.ashm4 = ashm(betahat, sebetahat,alpha=6,ncores=4)
+#' #beta.ashm4 = ashm(betahat, sebetahat,alpha=6,ncores=4)
 #' print(beta.ashm[[1]])  #best ash object
 #' print(beta.ashm[[2]])  #corresponding model type
 #' print(beta.ashm[[3]])  #log-likelihood for all models
